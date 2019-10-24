@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="BIT_Services.UserControls.saveCancel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BIT_Services.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="700">
+    <Grid Height="50">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+
+        <TextBlock Name="output"
+                   Text=""
+                   FontSize="16"
+                   Grid.Column="1"
+                   TextAlignment="Center"
+                   Width="auto"
+                   Height="auto"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+        
+        <Button Grid.Column="2"
+                Content="Save"
+                Height="35"
+                Width="100"
+                FontSize="18"
+                Name="saveButton"
+                Margin="10, 0, 5, 0"/>
+
+        <Button Grid.Column="3"
+                Content="Cancel"
+                Height="35"
+                Width="100"
+                FontSize="18"
+                Name="cancelButton"
+                Margin="5, 0, 10, 0"/>
+    </Grid>
+</UserControl>

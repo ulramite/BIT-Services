@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="BIT_Services.UserControls.addUpdateDelete"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BIT_Services.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="700">
+    <Grid Height="50">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Button Grid.Column="1"
+                Content="Add"
+                Height="35"
+                Width="100"
+                FontSize="18"
+                Name="addButton"
+                Margin="10, 0, 5, 0"/>
+
+        <Button Grid.Column="2"
+                Content="Update"
+                Height="35"
+                Width="100"
+                FontSize="18"
+                Name="updateButton"
+                Margin="5, 0, 5, 0"/>
+
+        <Button Grid.Column="3"
+                Content="Delete"
+                Height="35"
+                Width="100"
+                FontSize="18"
+                Name="deleteButton"
+                Margin="5, 0, 10, 0"/>
+    </Grid>
+</UserControl>
