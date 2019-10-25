@@ -48,7 +48,7 @@ namespace BIT_Services.ViewModel
 		/// </summary>
 		public SecureString SecurePassword { get => securePassword; set =>  securePassword = value; }
 		/// <summary>
-		/// Contains user information
+		/// Contains information about current user, obtained after logging in.
 		/// </summary>
         public User CurrentUser { get; }
 		/// <summary>
