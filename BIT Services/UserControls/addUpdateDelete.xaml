@@ -20,7 +20,8 @@
                 Width="100"
                 FontSize="18"
                 Name="addButton"
-                Margin="10, 0, 5, 0"/>
+                Margin="10, 0, 5, 0"
+				Command="{Binding AddButtonCommand}"/>
 
         <Button Grid.Column="2"
                 Content="Update"
@@ -28,7 +29,8 @@
                 Width="100"
                 FontSize="18"
                 Name="updateButton"
-                Margin="5, 0, 5, 0"/>
+                Margin="5, 0, 5, 0"
+				Command="{Binding UpdateButtonCommand}"/>
 
         <Button Grid.Column="3"
                 Content="Delete"
@@ -36,6 +38,7 @@
                 Width="100"
                 FontSize="18"
                 Name="deleteButton"
-                Margin="5, 0, 10, 0"/>
+                Margin="5, 0, 10, 0"
+				Command="{Binding DeleteButtonCommand}"/>
     </Grid>
 </UserControl>

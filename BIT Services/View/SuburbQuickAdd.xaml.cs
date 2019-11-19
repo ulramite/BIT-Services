@@ -1,5 +1,4 @@
-﻿using BIT_Services.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,14 +15,13 @@ using System.Windows.Shapes;
 namespace BIT_Services.View
 {
     /// <summary>
-    /// Interaction logic for CoordinatorMainWindow.xaml
+    /// Interaction logic for SuburbQuickAdd.xaml
     /// </summary>
-    public partial class CoordinatorMainWindow : Window
+    public partial class SuburbQuickAdd : Window
     {
-        public CoordinatorMainWindow()
+        public SuburbQuickAdd()
         {
             InitializeComponent();
-			this.DataContext = new OpenWindowViewModel();
         }
     }
 }

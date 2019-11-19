@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BIT_Services.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,8 @@ namespace BIT_Services.View
         public StaffCRUD()
         {
             InitializeComponent();
+			StaffCRUDViewModel vm = new StaffCRUDViewModel();
+			this.DataContext = vm;
         }
     }
 }

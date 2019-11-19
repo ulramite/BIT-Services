@@ -1,6 +1,7 @@
 ﻿using BIT_Services.Commands;
 using BIT_Services.Model;
 using BIT_Services.View;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,26 +9,35 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace BIT_Services.ViewModel
 {
 	class LoginViewModel : NotificationClass
 	{
-		private string outputText;
-		private string username;
-		private SecureString securePassword;
-        private User currentUser;
-
-		
+		// <!------------ VARIABLES ------------!>
+		private string _outputText;
+		private string _username;
+		private SecureString _securePassword;
+        private User _currentUser;
 		/// <summary>
-		/// Should be bound to output text box
+		/// Contains information about current user, obtained after logging in.
+		/// </summary>
+        private User CurrentUser { get; }
+		
+
+
+		// <!------------ BINDINGS ------------!>
+
+		/// <summary>
+		/// Bound to output text box
 		/// </summary>
 		public string OutputText
 		{
-			get { return outputText; }
+			get { return _outputText; }
 			set
 			{
-				outputText = value;
+				_outputText = value;
 				OnPropertyChanged("OutputText");
 			}
 		}
@@ -36,74 +46,80 @@ namespace BIT_Services.ViewModel
 		/// </summary>
 		public string Username
 		{
-			get { return username; }
+			get { return _username; }
 			set
 			{
-				username = value;
+				_username = value;
 				OnPropertyChanged("Username");
 			}
 		}
 		/// <summary>
 		/// Bound to passwordbox
 		/// </summary>
-		public SecureString SecurePassword { get => securePassword; set =>  securePassword = value; }
-		/// <summary>
-		/// Contains information about current user, obtained after logging in.
-		/// </summary>
-        public User CurrentUser { get; }
-		/// <summary>
-		/// Contains action provided by view to close the view.
-		/// </summary>
-		private Action CloseView { get; set; }
-
+		public SecureString SecurePassword { get => _securePassword; set =>  _securePassword = value; }
 
 		/// <summary>
-		/// Constructor takes action to close view.
+		/// Contains method from view to close the view.
 		/// </summary>
-		/// <param name="CloseViewAction">Action that closes view. Should be "this.close()"</param>
-		public LoginViewModel(Action CloseViewAction)
+		public Action CloseAction { get; set; }
+
+
+
+		// <!------------ CONSTRUCTORS ------------!>
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		public LoginViewModel()
 		{
-			CloseView = CloseViewAction;
+
 		}
 
 
+
+		// <!------------ METHODS ------------!>
 
 		/// <summary>
 		/// Links button to TestUsernamePassword()
 		/// </summary>
 		public RelayCommand Login { get { return new RelayCommand(TestUsernamePassword, true); } }
+
 		/// <summary>
 		/// Checks database to get user account type and user id. Then opens the appropriate window and closes the view.
 		/// </summary>
 		private void TestUsernamePassword()
 		{
-            currentUser = DAL.CheckLogin(Username, SecurePassword);
+			try
+			{
+				_currentUser = DAL.CheckLogin(Username, SecurePassword);
 
-            if (currentUser != null)
-            {
-                if (currentUser.UserType == "Coordinator")
-                {
-                    CoordinatorMainWindow mainWindow = new CoordinatorMainWindow();
-                    mainWindow.Show();
-					CloseView();
-					
-                }
-                else if (currentUser.UserType == "Admin")
-                {
-                    AdminMainWindow mainWindow = new AdminMainWindow();
-                    mainWindow.Show();
-					CloseView();
-                }
 
-            }
-            else
-            {
-                OutputText = "Incorrect username/password";
-            }
+				if (_currentUser != null)
+				{
+					if (_currentUser.UserType == "Coordinator")
+					{
+						CoordinatorMainWindow mainWindow = new CoordinatorMainWindow();
+						mainWindow.Show();
+						CloseAction();
 
+					}
+					else if (_currentUser.UserType == "Admin")
+					{
+						AdminMainWindow mainWindow = new AdminMainWindow();
+						mainWindow.Show();
+						CloseAction();
+					}
+
+				}
+				else
+				{
+					OutputText = "Incorrect username/password";
+				}
+			}
+			catch (MySqlException)
+			{
+				OutputText = "Error logging in";
+			}
         }
-
-
-		
 	}
 }

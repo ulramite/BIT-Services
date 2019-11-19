@@ -16,14 +16,14 @@
 
 
         <TextBlock Name="output"
-                   Text=""
                    FontSize="16"
                    Grid.Column="1"
                    TextAlignment="Center"
                    Width="auto"
                    Height="auto"
                    HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+                   VerticalAlignment="Center"
+				   Text="{Binding Output}"/>
         
         <Button Grid.Column="2"
                 Content="Save"
@@ -31,7 +31,8 @@
                 Width="100"
                 FontSize="18"
                 Name="saveButton"
-                Margin="10, 0, 5, 0"/>
+                Margin="10, 0, 5, 0"
+				Command="{Binding SaveButtonCommand}"/>
 
         <Button Grid.Column="3"
                 Content="Cancel"
@@ -39,6 +40,7 @@
                 Width="100"
                 FontSize="18"
                 Name="cancelButton"
-                Margin="5, 0, 10, 0"/>
+                Margin="5, 0, 10, 0"
+				Command="{Binding CancelButtonCommand}"/>
     </Grid>
 </UserControl>

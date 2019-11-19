@@ -36,15 +36,18 @@
 
 			<Button Name="openClientCRUD"
 					Content="Clients"
-					Grid.Row="0"/>
+					Grid.Row="0"
+					Command="{Binding OpenClient}"/>
 			
 			<Button Name="openContractorCRUD"
 					Content="Contractors"
-					Grid.Row="1"/>
+					Grid.Row="1"
+					Command="{Binding OpenContractor}"/>
 			
 			<Button Name="openJobRequests"
 					Content="Job Requests"
-					Grid.Row="2"/>
+					Grid.Row="2"
+					Command="{Binding OpenRequest}"/>
 		</Grid>
 	</Grid>
 </Window>

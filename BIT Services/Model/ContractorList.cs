@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BIT_Services.ViewModel
+namespace BIT_Services.Model
 {
-	class CoordinatorMainViewModel
+	class ContractorList : ObservableCollection<Contractor>
 	{
-
 	}
 }

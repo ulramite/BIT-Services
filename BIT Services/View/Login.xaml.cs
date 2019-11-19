@@ -23,7 +23,13 @@ namespace BIT_Services.View
         public Login()
         {
             InitializeComponent();
-			this.DataContext = new LoginViewModel(new Action(this.Close));
+			LoginViewModel vm = new LoginViewModel();
+			this.DataContext = vm;
+			if ( vm.CloseAction == null)
+			{
+				vm.CloseAction = new Action(this.Close);
+			}
+			
         }
 
 		// Required for security reasons

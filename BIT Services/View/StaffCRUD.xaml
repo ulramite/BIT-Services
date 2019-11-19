@@ -53,21 +53,35 @@
                          Height="20"
                          Width="150"
                          Margin="10, 10, 120, 0"
-                         HorizontalAlignment="Right"/>
+                         HorizontalAlignment="Right"
+						 Text="{Binding FilterString}"/>
 				<Button Name="searchButton"
                         Grid.Row="0" 
                         Height="20"
                         Width="100"
                         Content="Search Name"
                         HorizontalAlignment="Right"
-                        Margin="10, 10, 10, 0"/>
+                        Margin="10, 10, 10, 0"
+						Command="{Binding FilterCollection}"/>
 
 
 				<DataGrid Name="coordDataGrid"
                           Grid.Row="1"
                           Margin="10"
 						  IsReadOnly="True"
-						  CanUserAddRows="False">
+						  CanUserAddRows="False"
+						  ItemsSource="{Binding CoordinatorList}"
+						  AutoGenerateColumns="False"
+						  SelectedItem="{Binding SelectedCoordinator}"
+						  IsEnabled="{Binding CoordinatorListEnabled}">
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="Full Name" Binding="{Binding FullName}"/>
+						<DataGridTextColumn Header="Address" Binding="{Binding Address}"/>
+						<DataGridTextColumn Header="State" Binding="{Binding State}"/>
+						<DataGridTextColumn Header="Suburb" Binding="{Binding Suburb}"/>
+						<DataGridTextColumn Header="Mobile" Binding="{Binding Mobile}"/>
+						<DataGridTextColumn Header="Email" Binding="{Binding Email}"/>
+					</DataGrid.Columns>
 				</DataGrid>
 			</Grid>
 
@@ -129,25 +143,33 @@
                              Grid.Column="1"
                              VerticalAlignment="Center"
                              FontSize="16"
-                             Margin="5, 5, 10, 5"/>
+                             Margin="5, 5, 10, 5"
+							 Text="{Binding CoordinatorFirstName}"
+							 IsReadOnly="{Binding DataEntryDisallowed}"/>
 					<TextBox Name="coordLastName"
                              Grid.Row="1"
                              Grid.Column="1"
                              VerticalAlignment="Center"
                              FontSize="16"
-                             Margin="5, 5, 10, 5"/>
+                             Margin="5, 5, 10, 5"
+							 Text="{Binding CoordinatorLastName}"
+							 IsReadOnly="{Binding DataEntryDisallowed}"/>
 					<TextBox Name="coordPhone"
                              Grid.Row="2"
                              Grid.Column="1"
                              VerticalAlignment="Center"
                              FontSize="16"
-                             Margin="5, 5, 10, 5"/>
+                             Margin="5, 5, 10, 5"
+							 Text="{Binding CoordinatorPhone}"
+							 IsReadOnly="{Binding DataEntryDisallowed}"/>
 					<TextBox Name="coordEmail"
                              Grid.Row="3"
                              Grid.Column="1"
                              VerticalAlignment="Center"
                              FontSize="16"
-                             Margin="5, 5, 10, 5"/>
+                             Margin="5, 5, 10, 5"
+							 Text="{Binding CoordinatorEmail}"
+							 IsReadOnly="{Binding DataEntryDisallowed}"/>
 				</Grid>
 
 				<!-- Contains Suburb and Notes-->
@@ -189,25 +211,29 @@
 							 Grid.Column="1"
 							 FontSize="16"
 							 VerticalAlignment="Center"
-							 Margin="5, 5, 10, 5"/>
+							 Margin="5, 5, 10, 5"
+							 Text="{Binding CoordinatorAddress}"
+							 IsReadOnly="{Binding DataEntryDisallowed}"/>
 					<!-- Suburb selector will be an editable combobox, to help user select a correct suburb and will be filled from database. -->
 					<ComboBox Name="coordSuburb" 
 							  Grid.Row="1"
                               Grid.Column="1"
-                              IsEditable="True"
                               VerticalAlignment="Center"
                               Width="auto"
                               FontSize="16"
-                              Margin="5, 0, 10, 0">
-						<ComboBoxItem Content="Hornsby"/>
-						<ComboBoxItem Content="Castle Hill"/>
+                              Margin="5, 0, 10, 0"
+							  ItemsSource="{Binding SuburbList}"
+							  SelectedIndex="{Binding CoordinatorSuburbIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+							  IsEnabled="{Binding DataEntryAllowed}">
 					</ComboBox>
 					<TextBox Name="coordState"
 							 Grid.Row="2"
 							 Grid.Column="1"
 							 FontSize="16"
 							 VerticalAlignment="Center"
-							 Margin="5, 5, 10, 5"/>
+							 Margin="5, 5, 10, 5"
+							 Text="{Binding CoordinatorState}"
+							 IsReadOnly="{Binding DataEntryDisallowed}"/>
 					<!-- Notes -->
 
 				</Grid>

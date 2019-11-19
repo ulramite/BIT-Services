@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BIT_Services.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+
+
 namespace BIT_Services.View
 {
     /// <summary>
@@ -22,6 +25,7 @@ namespace BIT_Services.View
         public AdminMainWindow()
         {
             InitializeComponent();
+			this.DataContext = new OpenWindowViewModel();
         }
     }
 }
