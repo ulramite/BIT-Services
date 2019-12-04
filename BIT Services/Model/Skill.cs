@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-    class Skill
+    public class Skill
     {
 		private string _skillName;
 		private string _skillDescription;
@@ -19,5 +19,10 @@ namespace BIT_Services.Model
 			SkillName = skillName;
 			SkillDescription = skillDescription;
 		}
-	}
+
+        public override string ToString()
+        {
+            return SkillName;
+        }
+    }
 }

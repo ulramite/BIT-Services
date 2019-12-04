@@ -93,9 +93,10 @@ namespace BIT_Services.ViewModel
 			{
 				_currentUser = DAL.CheckLogin(Username, SecurePassword);
 
-
+				
 				if (_currentUser != null)
 				{
+					new EventLogger().Log("User logged in");
 					if (_currentUser.UserType == "Coordinator")
 					{
 						CoordinatorMainWindow mainWindow = new CoordinatorMainWindow();

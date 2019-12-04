@@ -1,5 +1,6 @@
 ﻿using BIT_Services.Commands;
 using BIT_Services.Model;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -357,10 +358,17 @@ namespace BIT_Services.ViewModel
 			DialogResult confirmation = System.Windows.Forms.MessageBox.Show("Are you sure you want to delete coordinator " + SelectedCoordinator.FullName + "?", "Confirm Delete", MessageBoxButtons.YesNo);
 			if (confirmation == DialogResult.Yes)
 			{
-				DAL.DeleteCoordinator(SelectedCoordinator);
-				SelectedCoordinator = null;
-				UpdateCoordinatorList();
-				ResetDataEntry();
+				try
+				{
+					DAL.DeleteCoordinator(SelectedCoordinator);
+					SelectedCoordinator = null;
+					UpdateCoordinatorList();
+					ResetDataEntry();
+				}
+				catch (MySqlException)
+				{
+					MessageBox.Show("Failed to delete coordinator.", "Failed to delete", MessageBoxButtons.OK);
+				}
 			}
 		}
 
@@ -369,32 +377,43 @@ namespace BIT_Services.ViewModel
 			string validateMessage = ValidateData();
 			if (validateMessage == null)
 			{
-				if (SelectedCoordinator != null) // Are we  in update mode?
+				try
 				{
-					Coordinator updatedCoordinator = new Coordinator(
-						SelectedCoordinator.CoordinatorID,
-						CoordinatorFirstName,
-						CoordinatorLastName,
-						CoordinatorAddress,
-						CoordinatorState,
-						CoordinatorSuburb,
-						CoordinatorPhone,
-						CoordinatorEmail
-						);
-					DAL.UpdateCoordinator(updatedCoordinator);
+					if (SelectedCoordinator != null) // Are we  in update mode?
+					{
+						Coordinator updatedCoordinator = new Coordinator(
+							SelectedCoordinator.CoordinatorID,
+							CoordinatorFirstName,
+							CoordinatorLastName,
+							CoordinatorAddress,
+							CoordinatorState,
+							CoordinatorSuburb,
+							CoordinatorPhone,
+							CoordinatorEmail
+							);
+						DAL.UpdateCoordinator(updatedCoordinator);
+						new EventLogger().Log("Updated Coordinator in database");
+					}
+					else // No we are in add mode
+					{
+						Coordinator newCoordinator = new Coordinator(
+							CoordinatorFirstName,
+							CoordinatorLastName,
+							CoordinatorAddress,
+							CoordinatorState,
+							CoordinatorSuburb,
+							CoordinatorPhone,
+							CoordinatorEmail
+							);
+						DAL.InsertCoordinator(newCoordinator);
+
+						new EventLogger().Log("Inserted Coordinator into database");
+					}
 				}
-				else // No we are in add mode
+				catch (MySqlException)
 				{
-					Coordinator newCoordinator = new Coordinator(
-						CoordinatorFirstName,
-						CoordinatorLastName,
-						CoordinatorAddress,
-						CoordinatorState,
-						CoordinatorSuburb,
-						CoordinatorPhone,
-						CoordinatorEmail
-						);
-					DAL.InsertCoordinator(newCoordinator);
+
+					MessageBox.Show("Failed to save coordinator", "Saving Failed", MessageBoxButtons.OK);
 				}
 
 				SelectedCoordinator = null;
@@ -436,10 +455,45 @@ namespace BIT_Services.ViewModel
 		/// <returns>Null if all data was successfully validated, otherrwise a string describing the problem with validation</returns>
 		private string ValidateData()
 		{
+			if (CoordinatorFirstName == "" || CoordinatorFirstName == null)
+			{
+				return "Missing First Name";
+			}
+			if (CoordinatorLastName == "" || CoordinatorLastName == null)
+			{
+				return "Missing Last Name";
+			}
+			if (CoordinatorEmail == "" || CoordinatorPhone == null)
+			{
+				return "Missing Email";
+			}
+			if (CoordinatorAddress == "" || CoordinatorAddress == null)
+			{
+				return "Missing Address";
+			}
+			if (CoordinatorSuburb == null)
+			{
+				return "Missing Suburb";
+			}
+
+
 			if (CoordinatorState.Length > 3)
 			{
 				return "State must be no longer than three characters. E.G. NSW, QLD";
 			}
+			if (CoordinatorPhone.Length != 10)
+			{
+				return "Phone number must be 10 digits long with no spaces";
+			}
+
+
+			try { System.Net.Mail.MailAddress email = new System.Net.Mail.MailAddress(CoordinatorEmail); }
+			catch (FormatException)
+			{
+				return "Please enter a valid email";
+			}
+
+
 			return null;
 		}
 	}

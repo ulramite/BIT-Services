@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-    class Client
+    public class Client
     {
         private int _clientID;
         private string _clientName;

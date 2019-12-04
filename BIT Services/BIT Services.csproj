@@ -76,16 +76,19 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\Conversions.cs" />
+    <Compile Include="Commands\EventLogger.cs" />
     <Compile Include="Commands\NotificationClass.cs" />
     <Compile Include="Commands\RandomPasswordGenerator.cs" />
     <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="Model\AssignableContractor.cs" />
+    <Compile Include="Model\AssignableContractorList.cs" />
     <Compile Include="Model\Client.cs" />
     <Compile Include="Model\ClientList.cs" />
     <Compile Include="Model\Contractor.cs" />
     <Compile Include="Model\ContractorList.cs" />
     <Compile Include="Model\Coordinator.cs" />
     <Compile Include="Model\CoordinatorList.cs" />
-    <Compile Include="Model\DAL.cs" />
+    <Compile Include="ViewModel\DAL.cs" />
     <Compile Include="Model\JobRequest.cs" />
     <Compile Include="Model\JobRequestList.cs" />
     <Compile Include="Model\Skill.cs" />
@@ -101,9 +104,13 @@
     </Compile>
     <Compile Include="ViewModel\ClientCRUDViewModel.cs" />
     <Compile Include="ViewModel\ContractorCRUDViewModel.cs" />
+    <Compile Include="ViewModel\JobRequestsViewModel.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
+    <Compile Include="ViewModel\NewJobRequestViewModel.cs" />
     <Compile Include="ViewModel\OpenWindowViewModel.cs" />
+    <Compile Include="ViewModel\SkillEditViewModel.cs" />
     <Compile Include="ViewModel\StaffCRUDViewModel.cs" />
+    <Compile Include="ViewModel\SuburbEditViewModel.cs" />
     <Compile Include="View\AdminMainWindow.xaml.cs">
       <DependentUpon>AdminMainWindow.xaml</DependentUpon>
     </Compile>
@@ -125,20 +132,14 @@
     <Compile Include="View\NewJobRequest.xaml.cs">
       <DependentUpon>NewJobRequest.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\SkillQuickAdd.xaml.cs">
-      <DependentUpon>SkillQuickAdd.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\SkillQuickDelete.xaml.cs">
-      <DependentUpon>SkillQuickDelete.xaml</DependentUpon>
+    <Compile Include="View\SkillEdit.xaml.cs">
+      <DependentUpon>SkillEdit.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\StaffCRUD.xaml.cs">
       <DependentUpon>StaffCRUD.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\SuburbQuickAdd.xaml.cs">
-      <DependentUpon>SuburbQuickAdd.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\SuburbQuickDelete.xaml.cs">
-      <DependentUpon>SuburbQuickDelete.xaml</DependentUpon>
+    <Compile Include="View\SuburbEdit.xaml.cs">
+      <DependentUpon>SuburbEdit.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -192,11 +193,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\SkillQuickAdd.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\SkillQuickDelete.xaml">
+    <Page Include="View\SkillEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -204,11 +201,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\SuburbQuickAdd.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\SuburbQuickDelete.xaml">
+    <Page Include="View\SuburbEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

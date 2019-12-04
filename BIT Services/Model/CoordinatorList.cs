@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-	class CoordinatorList : ObservableCollection<Coordinator>
+	public class CoordinatorList : ObservableCollection<Coordinator>
 	{
 	}
 }

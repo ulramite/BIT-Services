@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BIT_Services.View"
         mc:Ignorable="d"
-        Title="" Height="300" Width="375" ResizeMode="NoResize">
+        Title="" Height="375" Width="375" ResizeMode="NoResize">
 	<Window.Resources>
 		<ResourceDictionary Source="..\Style\Styles.xaml"/>
 	</Window.Resources>
@@ -33,6 +33,7 @@
 				<RowDefinition/>
 				<RowDefinition/>
 				<RowDefinition/>
+				<RowDefinition/>
 			</Grid.RowDefinitions>
 
 			<Button Name="openClientCRUD"
@@ -54,6 +55,22 @@
 					Content="Staff"
 					Grid.Row="3"
 					Command="{Binding OpenStaff}"/>
+
+			<Grid Grid.Row="4">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+
+				<Button Name="openSkillCRUD"
+						Content="Skills"
+						Grid.Column="0"
+						Command="{Binding OpenSkill}"/>
+				<Button Name="openSuburbCRUD"
+						Content="Suburbs"
+						Grid.Column="1"
+						Command="{Binding OpenSuburb}"/>
+			</Grid>
 
 		</Grid>
 	</Grid>

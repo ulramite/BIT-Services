@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-	class Coordinator
+	public class Coordinator
 	{
 		private int _coordinatorID;
 		private string _firstName;

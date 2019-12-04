@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-	class SuburbList : ObservableCollection<Suburb>
+	public class SuburbList : ObservableCollection<Suburb>
 	{
 		public SuburbList()
 		{

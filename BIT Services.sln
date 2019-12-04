@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BIT Services", "BIT Services\BIT Services.csproj", "{97607F67-07A5-4690-8AA1-EA6C9863808B}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "BIT Services Installer", "BIT Services Installer\BIT Services Installer.vdproj", "{2A884ECD-E76D-4A80-9F4C-BA0584E42F8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BIT Services Unit Tests", "BIT Services Unit Tests\BIT Services Unit Tests.csproj", "{DE649CB4-C9A3-4D79-BFF2-FE8C31D84907}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,12 @@ Global
 		{97607F67-07A5-4690-8AA1-EA6C9863808B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97607F67-07A5-4690-8AA1-EA6C9863808B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97607F67-07A5-4690-8AA1-EA6C9863808B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A884ECD-E76D-4A80-9F4C-BA0584E42F8F}.Debug|Any CPU.ActiveCfg = Debug
+		{2A884ECD-E76D-4A80-9F4C-BA0584E42F8F}.Release|Any CPU.ActiveCfg = Release
+		{DE649CB4-C9A3-4D79-BFF2-FE8C31D84907}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE649CB4-C9A3-4D79-BFF2-FE8C31D84907}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE649CB4-C9A3-4D79-BFF2-FE8C31D84907}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE649CB4-C9A3-4D79-BFF2-FE8C31D84907}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

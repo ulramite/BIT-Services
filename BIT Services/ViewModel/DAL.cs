@@ -1,4 +1,5 @@
 ﻿using BIT_Services.Commands;
+using BIT_Services.Model;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace BIT_Services.Model
+namespace BIT_Services.ViewModel
 {
-	static class DAL
+	public static class DAL
 	{
 		private static MySqlCommand GetProcedure(string storedProcedureName)
 		{
@@ -37,8 +38,9 @@ namespace BIT_Services.Model
 		private static MySqlDataReader ExecuteReader(string storedProcedureName)
 		{
 			MySqlCommand cmd = GetProcedure(storedProcedureName);
+            MySqlDataReader resultReader = cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
 
-			return cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
+            return resultReader;
 		}
 
 		/// <summary>
@@ -50,32 +52,40 @@ namespace BIT_Services.Model
 		private static MySqlDataReader ExecuteReader(string storedProcedureName, MySqlParameter[] parameterList )
 		{
 			MySqlCommand cmd = GetProcedure(storedProcedureName);
-			cmd.Parameters.AddRange(parameterList);
+            cmd.Parameters.AddRange(parameterList);
+            MySqlDataReader resultReader = cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
 
-			return cmd.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
+            return resultReader;
 		}
-
-
 
 		private static int ExecuteNonQuery(string storedProcedureName)
 		{
 			MySqlCommand cmd = GetProcedure(storedProcedureName);
-
-			return cmd.ExecuteNonQuery();
+            int intResult = cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+            cmd.Dispose();
+            return intResult;
 		}
 
 		private static int ExecuteNonQuery(string storedProcedureName, MySqlParameter[] parameterList)
 		{
 			MySqlCommand cmd = GetProcedure(storedProcedureName);
 			cmd.Parameters.AddRange(parameterList);
-			return cmd.ExecuteNonQuery();
+            int intResult = cmd.ExecuteNonQuery();
+            cmd.Connection.Close();
+            cmd.Dispose();
+
+            return intResult;
 		}
 
 		private static object ExecuteScalar(string storedProcedureName)
 		{
 			MySqlCommand cmd = GetProcedure(storedProcedureName);
-			
-			return cmd.ExecuteScalar();
+            object objectResult = cmd.ExecuteScalar();
+            cmd.Connection.Close();
+            cmd.Dispose();
+
+            return objectResult;
 		}
 
 
@@ -96,10 +106,16 @@ namespace BIT_Services.Model
             if (result.HasRows)
             {
                 result.Read();
-                return new User((int)result.GetValue(1), (string)result.GetValue(0));
+                User returnUser = new User((int)result.GetValue(1), (string)result.GetValue(0));
+
+                result.Close();
+
+                return returnUser;
             }
             else
+                result.Close();
                 return null;
+            
 		}
 
 
@@ -120,6 +136,8 @@ namespace BIT_Services.Model
 			{
 				suburbList.Add(new Suburb(result.GetString("suburbName")));
 			}
+
+            result.Close();
 
 			return suburbList;
 		}
@@ -154,6 +172,8 @@ namespace BIT_Services.Model
 					result.GetString("notes")
 					));
 			}
+
+            result.Close();
 
 			return clientList;
 		}
@@ -275,6 +295,8 @@ namespace BIT_Services.Model
 					result.GetString("mobile"),
 					result.GetString("email")));
 			}
+
+            result.Close();
 			return coordinatorList;
 		}
 
@@ -378,6 +400,8 @@ namespace BIT_Services.Model
 					));
 			}
 
+            result.Close();
+
 			return contractorList;
 		}
 
@@ -461,6 +485,8 @@ namespace BIT_Services.Model
 				suburbList.Add(new Suburb(result.GetString("suburb")));
 			}
 
+            result.Close();
+
 			return suburbList;
 		}
 
@@ -481,6 +507,8 @@ namespace BIT_Services.Model
 			{
 				suburbList.Add(new Suburb(result.GetString("SuburbName")));
 			}
+
+            result.Close();
 
 			return suburbList;
 		}
@@ -508,6 +536,8 @@ namespace BIT_Services.Model
 					));
 			}
 
+            result.Close();
+
 			return skillList;
 		}
 
@@ -531,6 +561,8 @@ namespace BIT_Services.Model
 					result.GetString("skillDescription")
 					));
 			}
+
+            result.Close();
 
 			return skillList;
 		}
@@ -599,6 +631,395 @@ namespace BIT_Services.Model
 			string storedProcedureName = "usp_getContractorAutoIncrement";
 
 			return ExecuteNonQuery(storedProcedureName);
+		}
+
+
+
+
+		//// -------------JOBREQUEST LOGIC------------- //
+
+		public static JobRequestList GetJobRequests()
+		{
+			string storedProcedureName = "usp_getJobRequests";
+
+			MySqlDataReader result = ExecuteReader(storedProcedureName);
+
+			JobRequestList jobRequestList = new JobRequestList();
+
+			while (result.Read())
+			{
+				jobRequestList.Add(new JobRequest(
+					result.GetInt32("jobRequestID"),
+					result.GetInt32("clientID"),
+					result.IsDBNull(result.GetOrdinal("coordinatorID")) ? null : result.GetInt32("coordinatorID") as int?,
+					result.GetString("clientName"),
+					result.GetString("notes"),
+					result.GetDateTime("timeRequested"),
+					result.GetInt32("estimatedHours"),
+					result.GetInt32("status"),
+					result.GetString("address"),
+					new Suburb(result.GetString("suburb")),
+					result.IsDBNull(result.GetOrdinal("feedback")) ? null : result.GetString("feedback") 
+					));
+			}
+
+			result.Close();
+
+			return jobRequestList;
+		}
+
+
+
+		public static int InsertJobRequest(JobRequest jobRequest)
+		{
+			string storedProcedureName = "usp_insertJobRequest";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("clientIDIn", jobRequest.ClientID),
+				new MySqlParameter("notesIn", jobRequest.Notes),
+				new MySqlParameter("timeIn", jobRequest.TimeRequested),
+				new MySqlParameter("estimatedHoursIn", jobRequest.EstimatedHours),
+				new MySqlParameter("addressIn", jobRequest.Address),
+				new MySqlParameter("suburbIn", jobRequest.Suburb),
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+
+
+		public static AssignableContractorList GetAssignableContractors(JobRequest jobrequest)
+		{
+			string storedProcedureName = "usp_getAssignableContractors";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("jobRequestIDIn", jobrequest.JobRequestID)
+			};
+
+			MySqlDataReader result = ExecuteReader(storedProcedureName, parameterList);
+
+			AssignableContractorList assignableContractorList = new AssignableContractorList();
+
+			while (result.Read())
+			{
+				assignableContractorList.Add(new AssignableContractor(
+					result.GetInt32("contractorID"),
+					result.GetString("firstName"),
+					result.GetString("lastName"),
+					result.GetString("address"),
+					result.GetString("state"),
+					new Suburb(result.GetString("suburb")),
+					result.GetString("mobile"),
+					result.GetString("email"),
+					DAL.HasSkillList(new Contractor(result.GetInt32("contractorID"))),
+					false,
+					result.GetTimeSpan("startTime"),
+					result.GetTimeSpan("endTime"),
+					null));
+			}
+
+			result.Close();
+
+			return assignableContractorList;
+		}
+
+		public static AssignableContractorList GetAssignedContractors(JobRequest jobrequest)
+		{
+			string storedProcedureName = "usp_getAssignedContractors";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("jobRequestIDIn", jobrequest.JobRequestID)
+			};
+
+			MySqlDataReader result = ExecuteReader(storedProcedureName, parameterList);
+
+			AssignableContractorList assignableContractorList = new AssignableContractorList();
+
+			while (result.Read())
+			{
+				assignableContractorList.Add(new AssignableContractor(
+					result.GetInt32("contractorID"),
+					result.GetString("firstName"),
+					result.GetString("lastName"),
+					result.GetString("address"),
+					result.GetString("state"),
+					new Suburb(result.GetString("suburb")),
+					result.GetString("mobile"),
+					result.GetString("email"),
+					DAL.HasSkillList(new Contractor(result.GetInt32("contractorID"))),
+					true,
+					result.GetTimeSpan("startTime"),
+					result.GetTimeSpan("endTime"),
+					result.GetInt32("status")));
+			}
+
+			result.Close();
+
+			return assignableContractorList;
+		}
+
+
+
+		public static int InsertContractorAssignment(JobRequest jobRequest, AssignableContractor contractor)
+		{
+			string storedProcedureName = "usp_insertContractorAssignment";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("jobRequestIDIn", jobRequest.JobRequestID),
+				new MySqlParameter("contractorIDIn", contractor.ContractorID),
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+		public static int DeleteContractorAssignment(JobRequest jobRequest, AssignableContractor contractor)
+		{
+			string storedProcedureName = "usp_deleteContractorAssignment";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("jobRequestIDIn", jobRequest.JobRequestID),
+				new MySqlParameter("contractorIDIn", contractor.ContractorID),
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+
+
+
+		public static int DeleteFullJobRequest(JobRequest jobRequestToDelete)
+		{
+			string storedProcedureName = "usp_deleteFullJobRequest";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("jobRequestIDIn", jobRequestToDelete.JobRequestID)
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+
+
+		public static int MarkRequestReady(JobRequest jobRequest)
+		{
+			string storedProcedureName = "usp_coordinatorMarkRequestReady";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("jobRequestIDIn", jobRequest.JobRequestID)
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+		public static int UnmarkRequestReady(JobRequest jobRequest)
+		{
+			string storedProcedureName = "usp_coordinatorUnmarkRequestReady";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("jobRequestIDIn", jobRequest.JobRequestID)
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+
+
+		public static int UpdateRequestHours(JobRequest jobRequest)
+		{
+			string storedProcedureName = "usp_coordinatorUpdateHours";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("jobRequestIDIn", jobRequest.JobRequestID),
+				new MySqlParameter("estimatedHoursIn", jobRequest.EstimatedHours)
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+		public static int GetJobRequestAutoIncrement()
+		{
+			string storedProcedureName = "usp_getJobRequestAutoIncrement";
+
+            MySqlDataReader result = ExecuteReader(storedProcedureName);
+
+            result.Read();
+
+			int returnResult = result.GetInt32("AUTO_INCREMENT");
+
+			result.Close();
+
+			return returnResult;
+        }
+
+
+
+
+        public static SkillList GetRequiredSkills(JobRequest jobRequest)
+		{
+			string storedProcedureName = "usp_getRequiredSkills";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("jobRequestIDIn", jobRequest.JobRequestID)
+			};
+
+			MySqlDataReader results = ExecuteReader(storedProcedureName, parameterList);
+
+			SkillList skillList = new SkillList();
+
+			while (results.Read())
+			{
+				skillList.Add(new Skill(
+					results.GetString("skillName"),
+					results.GetString("skillDescription")
+					));
+			}
+
+			results.Close();
+			return skillList;
+		}
+
+
+        
+        public static SkillList GetSkills()
+        {
+            string storedProcedureName = "usp_getSkills";
+
+            MySqlDataReader results = ExecuteReader(storedProcedureName);
+
+            SkillList skillList = new SkillList();
+
+            while (results.Read())
+            {
+                skillList.Add(new Skill(
+                    results.GetString("SkillName"),
+                    results.GetString("skillDescription")
+                    ));
+            }
+
+            results.Close();
+
+            return skillList;
+        }
+
+
+
+        public static SkillList GetNonRequiredSkills(JobRequest jobRequest)
+        {
+            string storedProcedureName = "usp_getNonRequiredSkills";
+
+            MySqlParameter[] parameterList = new MySqlParameter[]
+            {
+                new MySqlParameter("jobRequestIDIn", jobRequest.JobRequestID)
+            };
+
+            MySqlDataReader results = ExecuteReader(storedProcedureName, parameterList);
+
+            SkillList skillList = new SkillList();
+
+            while (results.Read())
+            {
+                skillList.Add(new Skill(
+                    results.GetString("skillName"),
+                    results.GetString("skillDescription")
+                    ));
+            }
+
+            results.Close();
+            return skillList;
+        }
+
+
+		
+		public static int InsertUpdateSkill(Skill skill)
+		{
+			string storedProcedureName = "usp_insertSkill";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("skillNameIn", skill.SkillName),
+				new MySqlParameter("skillDescriptionIn", skill.SkillDescription)
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+
+
+		public static int DeleteSkill(Skill skill)
+		{
+			string storedProcedureName = "usp_deleteSkill";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("SkillNameIn", skill.SkillName)
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+
+        public static int AddRequiredSkill(JobRequest jobRequest, Skill skill)
+        {
+            string storedProcedureName = "usp_addRequiredSkill";
+
+            MySqlParameter[] parameterList = new MySqlParameter[]
+            {
+                new MySqlParameter("jobRequestIDIn", jobRequest.JobRequestID),
+                new MySqlParameter("skillNameIn", skill.SkillName)
+            };
+
+            return ExecuteNonQuery(storedProcedureName, parameterList);
+        }
+
+
+
+        public static int DeleteRequiredSkill(JobRequest jobRequest, Skill skill)
+        {
+            string storedProcedureName = "usp_deleteRequiredSkill";
+
+            MySqlParameter[] parameterList = new MySqlParameter[]
+            {
+                new MySqlParameter("jobRequestIDIn", jobRequest.JobRequestID),
+                new MySqlParameter("skillNameIn", skill.SkillName)
+            };
+
+            return ExecuteNonQuery(storedProcedureName, parameterList);
+        }
+
+
+
+		public static int InsertSuburb(Suburb suburb)
+		{
+			string storedProcedureName = "usp_insertSuburb";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("SuburbNameIn", suburb.SuburbName)
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
+		}
+
+		public static int DeleteSuburb(Suburb suburb)
+		{
+			string storedProcedureName = "usp_deleteSuburb";
+
+			MySqlParameter[] parameterList = new MySqlParameter[]
+			{
+				new MySqlParameter("SuburbNameIn", suburb.SuburbName)
+			};
+
+			return ExecuteNonQuery(storedProcedureName, parameterList);
 		}
 	}
 }

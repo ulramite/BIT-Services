@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BIT_Services.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,12 @@ namespace BIT_Services.View
         public NewJobRequest()
         {
             InitializeComponent();
+			NewJobRequestViewModel vm = new NewJobRequestViewModel();
+            this.DataContext = vm;
+            if (vm.CloseAction == null)
+            {
+                vm.CloseAction = new Action(this.Close);
+            }
         }
     }
 }

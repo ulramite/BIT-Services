@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BIT_Services.View"
         xmlns:mycontrols="clr-namespace:BIT_Services.UserControls"
         mc:Ignorable="d"
-        Title="ClientCRUD" Height="700" Width="700" ResizeMode="NoResize">
+        Title="Clients" Height="700" Width="700" ResizeMode="NoResize">
 
 	<Window.Resources>
 		<ResourceDictionary Source="..\Style\Styles.xaml"/>

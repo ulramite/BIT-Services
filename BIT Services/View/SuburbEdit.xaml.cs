@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BIT_Services.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,13 +16,19 @@ using System.Windows.Shapes;
 namespace BIT_Services.View
 {
     /// <summary>
-    /// Interaction logic for SuburbQuickAdd.xaml
+    /// Interaction logic for SuburbEdit.xaml
     /// </summary>
-    public partial class SuburbQuickAdd : Window
+    public partial class SuburbEdit : Window
     {
-        public SuburbQuickAdd()
+        public SuburbEdit()
         {
             InitializeComponent();
+			SuburbEditViewModel vm = new SuburbEditViewModel();
+			this.DataContext = vm;
+			if (vm.CloseAction == null)
+			{
+				vm.CloseAction = this.Close;
+			}
         }
     }
 }

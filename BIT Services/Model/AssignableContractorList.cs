@@ -7,11 +7,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-    public class SkillList : ObservableCollection<Skill>
-    {
-        public SkillList()
-        {
-
-        }
+	public class AssignableContractorList : ObservableCollection<AssignableContractor>
+	{
 	}
 }

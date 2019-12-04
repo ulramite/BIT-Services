@@ -14,6 +14,8 @@ namespace BIT_Services.ViewModel
 		public RelayCommand OpenContractor { get { return new RelayCommand(OpenContractorWindow, true); } }
 		public RelayCommand OpenRequest { get { return new RelayCommand(OpenRequestWindow, true); } }
 		public RelayCommand OpenStaff { get { return new RelayCommand(OpenStaffWindow, true); } }
+		public RelayCommand OpenSkill { get { return new RelayCommand(OpenSkillWindow, true); } }
+		public RelayCommand OpenSuburb { get { return new RelayCommand(OpenSuburbWindow, true); } }
 
 
 
@@ -35,6 +37,16 @@ namespace BIT_Services.ViewModel
 		private void OpenStaffWindow()
 		{
 			new StaffCRUD().Show();
+		}
+
+		private void OpenSkillWindow()
+		{
+			new SkillEdit().Show();
+		}
+
+		private void OpenSuburbWindow()
+		{
+			new SuburbEdit().Show();
 		}
 	}
 }

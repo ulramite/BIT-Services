@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-	class Contractor
+	public class Contractor
 	{
 		private int _contractorID;
 		private string _firstName;
@@ -32,6 +32,11 @@ namespace BIT_Services.Model
 		public SkillList HasSkillList { get => _hasSkillList; }
 
 
+
+		public Contractor(int contractorID)
+		{
+			_contractorID = contractorID;
+		}
 
 		public Contractor(string firstName, string lastName, string address, string state, Suburb suburb, string mobile, string email)
 		{

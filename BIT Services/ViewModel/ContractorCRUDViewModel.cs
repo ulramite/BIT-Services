@@ -1,5 +1,7 @@
 ﻿using BIT_Services.Commands;
 using BIT_Services.Model;
+using BIT_Services.View;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +13,7 @@ using System.Windows.Forms;
 
 namespace BIT_Services.ViewModel
 {
-    class ContractorCRUDViewModel : NotificationClass
+     class ContractorCRUDViewModel : NotificationClass
     {
 		// Variables
 		private string _contractorFirstName;
@@ -147,7 +149,7 @@ namespace BIT_Services.ViewModel
 			{
 				_dataEntryAllowed = value;
                 OnPropertyChanged("DataEntryAllowed");
-                OnPropertyChanged("DataEntryDisllowed");
+                OnPropertyChanged("DataEntryDisallowed");
 
             }
 		}
@@ -335,6 +337,7 @@ namespace BIT_Services.ViewModel
 		}
 
 		// Command Bindings
+		public RelayCommand FilterCollection { get { return new RelayCommand(FilterContractorList, true); } }
 		public RelayCommand AddButtonCommand { get { return new RelayCommand(AddButton, true); } }
 		public RelayCommand UpdateButtonCommand { get { return new RelayCommand(UpdateButton, true); } }
 		public RelayCommand DeleteButtonCOmmand { get { return new RelayCommand(DeleteButton, true); } }
@@ -395,14 +398,30 @@ namespace BIT_Services.ViewModel
 
 		private void UpdateBothSuburbsList()
 		{
-			ContractorPreferredSuburbList = DAL.PreferredSuburbsList(SelectedContractor);
-			UnselectedSuburbList = DAL.UnselectedSuburbsList(SelectedContractor);
+            if (SelectedContractor != null)
+            {
+                ContractorPreferredSuburbList = DAL.PreferredSuburbsList(SelectedContractor);
+                UnselectedSuburbList = DAL.UnselectedSuburbsList(SelectedContractor);
+            }
+            else
+            {
+                ContractorPreferredSuburbList = new SuburbList();
+                UnselectedSuburbList = DAL.GetSuburbs();
+            }
 		}
 
 		private void UpdateBothSkillsList()
 		{
-			ContractorHasSkillList = DAL.HasSkillList(SelectedContractor);
-			UnselectedSkillList = DAL.UnselectedSkillList(SelectedContractor);
+            if (SelectedContractor != null)
+            {
+                ContractorHasSkillList = DAL.HasSkillList(SelectedContractor);
+                UnselectedSkillList = DAL.UnselectedSkillList(SelectedContractor);
+            }
+            else
+            {
+                ContractorHasSkillList = new SkillList();
+                UnselectedSkillList = DAL.GetSkills();
+            }
 		}
 
 
@@ -413,6 +432,8 @@ namespace BIT_Services.ViewModel
 			ResetDataEntry();
 			DataEntryAllowed = true;
 			ContractorListEnabled = false;
+            UpdateBothSkillsList();
+            UpdateBothSuburbsList();
 		}
 
 		private void UpdateButton()
@@ -425,13 +446,20 @@ namespace BIT_Services.ViewModel
 
 		private void DeleteButton()
 		{
-			DialogResult confirmation = System.Windows.Forms.MessageBox.Show("Are you sure you want to delete coordinator " + SelectedContractor.FullName + "?", "Confirm Delete", MessageBoxButtons.YesNo);
+			DialogResult confirmation = MessageBox.Show("Are you sure you want to delete coordinator " + SelectedContractor.FullName + "?", "Confirm Delete", MessageBoxButtons.YesNo);
 			if (confirmation == DialogResult.Yes)
 			{
-				DAL.DeleteContractor(SelectedContractor);
-				SelectedContractor = null;
-				UpdateContractorList();
-				ResetDataEntry();
+				try
+				{
+					DAL.DeleteContractor(SelectedContractor);
+					SelectedContractor = null;
+					UpdateContractorList();
+					ResetDataEntry();
+				}
+				catch (MySqlException)
+				{
+					MessageBox.Show("Failed to delete contractor, ensure they do not have any assignments, preferred suburbs or skills", "Failed to delete", MessageBoxButtons.OK);
+				}
 			}
 		}
 
@@ -442,86 +470,141 @@ namespace BIT_Services.ViewModel
 			{
 				if (SelectedContractor != null)// Are we  in update mode?
 				{
-					Contractor updatedContractor = new Contractor(
-						SelectedContractor.ContractorID,
-						ContractorFirstName,
-						ContractorLastName,
-						ContractorAddress,
-						ContractorState,
-						ContractorSuburb,
-						ContractorMobile,
-						ContractorEmail,
-						ContractorPreferredSuburbList,
-						ContractorHasSkillList
-						);
-					DAL.UpdateContractor(updatedContractor);
+					try
+					{
+						Contractor updatedContractor = new Contractor(
+										SelectedContractor.ContractorID,
+										ContractorFirstName,
+										ContractorLastName,
+										ContractorAddress,
+										ContractorState,
+										ContractorSuburb,
+										ContractorMobile,
+										ContractorEmail,
+										ContractorPreferredSuburbList,
+										ContractorHasSkillList
+										);
+						DAL.UpdateContractor(updatedContractor);
+						new EventLogger().Log("Updated Contractor in database");
 
 
-					// Grab the list of preferred suburbs from database
-					SuburbList DBPreferredSuburbList = DAL.PreferredSuburbsList(updatedContractor);
-					// Compare each entry from contractor to DB, if it does not exist in DB, add it
-					foreach (Suburb contractorSuburb in updatedContractor.PreferredSuburbList)
-					{
-						bool found = false;
-						foreach (Suburb dbSuburb in DBPreferredSuburbList)
-						{
-							if (contractorSuburb.SuburbName == dbSuburb.SuburbName)
-							{
-								found = true;
-								break;
-							}
-						}
-						if (!found)
-						{
-							DAL.AddPreferredSuburb(updatedContractor, contractorSuburb);
-						}
-					}
-					// Compare each entry from db to contractor, if it doesn't exist in contractor, remove it
-					foreach (Suburb dbSuburb in DBPreferredSuburbList)
-					{
-						bool found = false;
+						// Update Preferred Suburbs
+						// Grab the list of preferred suburbs from database
+						SuburbList DBPreferredSuburbList = DAL.PreferredSuburbsList(updatedContractor);
+						// Compare each entry from contractor to DB, if it does not exist in DB, add it
 						foreach (Suburb contractorSuburb in updatedContractor.PreferredSuburbList)
 						{
-							if (dbSuburb.SuburbName == contractorSuburb.SuburbName)
+							bool found = false;
+							foreach (Suburb dbSuburb in DBPreferredSuburbList)
 							{
-								found = true;
-								break;
+								if (contractorSuburb.SuburbName == dbSuburb.SuburbName)
+								{
+									found = true;
+									break;
+								}
+							}
+							if (!found)
+							{
+								DAL.AddPreferredSuburb(updatedContractor, contractorSuburb);
 							}
 						}
-						if (!found)
+						// Compare each entry from db to contractor, if it doesn't exist in contractor, remove it
+						foreach (Suburb dbSuburb in DBPreferredSuburbList)
 						{
-							DAL.RemovePreferredSuburb(updatedContractor, dbSuburb);
+							bool found = false;
+							foreach (Suburb contractorSuburb in updatedContractor.PreferredSuburbList)
+							{
+								if (dbSuburb.SuburbName == contractorSuburb.SuburbName)
+								{
+									found = true;
+									break;
+								}
+							}
+							if (!found)
+							{
+								DAL.RemovePreferredSuburb(updatedContractor, dbSuburb);
+							}
+						}
+
+
+						// Update Skills
+						// Get list of preferred Skills from database
+						SkillList DBSkillsList = DAL.HasSkillList(updatedContractor);
+						// Compare each entry from contractor to DB, if it does not exist in DB, add it
+						foreach (Skill contractorSkill in updatedContractor.HasSkillList)
+						{
+							bool found = false;
+							foreach (Skill dbSkill in DBSkillsList)
+							{
+								if (contractorSkill.SkillName == dbSkill.SkillName)
+								{
+									found = true;
+									break;
+								}
+							}
+							if (!found)
+							{
+								DAL.AddHasSkill(updatedContractor, contractorSkill);
+							}
+						}
+						// Compare each entry from db to contractor, if it doesn't exist in contractor, remove it
+						foreach (Skill dbSkill in DBSkillsList)
+						{
+							bool found = false;
+							foreach (Skill contractorSkill in updatedContractor.HasSkillList)
+							{
+								if (dbSkill.SkillName == contractorSkill.SkillName)
+								{
+									found = true;
+									break;
+								}
+							}
+							if (!found)
+							{
+								DAL.RemoveHasSkill(updatedContractor, dbSkill);
+							}
 						}
 					}
+					catch (MySqlException)
+					{
 
-					// TODO Code for updating skills and suburbs
+						MessageBox.Show("Failed to save contractor, their skills or their suburbs", "Saving Failed", MessageBoxButtons.OK);
+					}
 				}
 				else // No we are in add mode
 				{
-					Contractor newContractor = new Contractor(
-						SelectedContractor.ContractorID,
-						ContractorFirstName,
-						ContractorLastName,
-						ContractorAddress,
-						ContractorState,
-						ContractorSuburb,
-						ContractorMobile,
-						ContractorEmail,
-						ContractorPreferredSuburbList,
-						ContractorHasSkillList
-						);
-					DAL.InsertContractor(newContractor);
-
-					// Insert all suburbs
-					foreach (Suburb suburb in newContractor.PreferredSuburbList)
+					try
 					{
-						DAL.AddPreferredSuburb(newContractor, suburb);
+						Contractor newContractor = new Contractor(
+										ContractorFirstName,
+										ContractorLastName,
+										ContractorAddress,
+										ContractorState,
+										ContractorSuburb,
+										ContractorMobile,
+										ContractorEmail,
+										ContractorPreferredSuburbList,
+										ContractorHasSkillList
+										);
+						DAL.InsertContractor(newContractor);
+						new EventLogger().Log("Inserted Contractor into database");
+
+						// Insert all suburbs
+						foreach (Suburb suburb in newContractor.PreferredSuburbList)
+						{
+							DAL.AddPreferredSuburb(newContractor, suburb);
+						}
+
+						// Insert all skills
+						foreach (Skill skill in newContractor.HasSkillList)
+						{
+							DAL.AddHasSkill(newContractor, skill);
+						}
 					}
-
-					// Insert all skills
-					foreach (Skill skill in newContractor.HasSkillList)
+					catch (MySqlException)
 					{
-						DAL.AddHasSkill(newContractor, skill);
+
+						MessageBox.Show("Failed to save contractor", "Saving Failed", MessageBoxButtons.OK);
 					}
 				}
 				SelectedContractor = null;
@@ -530,6 +613,10 @@ namespace BIT_Services.ViewModel
 				DataEntryAllowed = false;
 				ContractorListEnabled = true;
 			}
+            else
+            {
+                System.Windows.Forms.MessageBox.Show(validateMessage, "Saving Failed", MessageBoxButtons.OK);
+            }
 		}
 
 		private void CancelButton()
@@ -567,7 +654,9 @@ namespace BIT_Services.ViewModel
 
 		private void EditSuburb()
 		{
-
+			SuburbEdit suburbWindow = new SuburbEdit();
+			suburbWindow.ShowDialog();
+			UpdateBothSuburbsList();
 		}
 
 
@@ -587,8 +676,8 @@ namespace BIT_Services.ViewModel
         {
             if (SelectedSkillToRemove != null)
             {
-                UnselectedSkillList.Add(SelectedSkillToAdd);
-                ContractorHasSkillList.Remove(SelectedSkillToAdd);
+                UnselectedSkillList.Add(SelectedSkillToRemove);
+                ContractorHasSkillList.Remove(SelectedSkillToRemove);
                 SelectedSkillToAdd = null;
                 SelectedSkillToRemove = null;
             }
@@ -596,7 +685,9 @@ namespace BIT_Services.ViewModel
 
 		private void EditSkill()
 		{
-
+			SkillEdit skillsWindow = new SkillEdit();
+			skillsWindow.ShowDialog();
+			UpdateBothSkillsList();
 		}
 
 
@@ -641,10 +732,45 @@ namespace BIT_Services.ViewModel
 		/// <returns>Null if all data was successfully validated, otherrwise a string describing the problem with validation</returns>
 		private string ValidateData()
 		{
+			if (ContractorFirstName == "" || ContractorFirstName == null)
+			{
+				return "Missing First Name";
+			}
+			if (ContractorLastName == "" || ContractorLastName == null)
+			{
+				return "Missing Last Name";
+			}
+			if (ContractorEmail == "" || ContractorMobile == null)
+			{
+				return "Missing Email";
+			}
+			if (ContractorAddress == "" || ContractorAddress == null)
+			{
+				return "Missing Address";
+			}
+			if (ContractorSuburb == null)
+			{
+				return "Missing Suburb";
+			}
+
+
 			if (ContractorState.Length > 3)
 			{
 				return "State must be no longer than three characters. E.G. NSW, QLD";
 			}
+			if (ContractorMobile.Length != 10)
+			{
+				return "Phone number must be 10 digits long with no spaces";
+			}
+
+
+			try { System.Net.Mail.MailAddress email = new System.Net.Mail.MailAddress(ContractorEmail); }
+			catch (FormatException)
+			{
+				return "Please enter a valid email";
+			}
+
+
 			return null;
 		}
 	}

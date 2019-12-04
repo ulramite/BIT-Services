@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-	class ClientList : ObservableCollection<Client>
+	public class ClientList : ObservableCollection<Client>
 	{
 
 	}

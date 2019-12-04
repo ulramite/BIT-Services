@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BIT_Services.View"
 		xmlns:usercontrols="clr-namespace:BIT_Services.UserControls"
 		mc:Ignorable="d"
-        Title="NewJobRequest" Height="700" Width="700" ResizeMode="NoResize">
+        Title="New Job Request" Height="700" Width="700" ResizeMode="NoResize">
 	<Window.Resources>
 		<ResourceDictionary Source="..\Style\Styles.xaml"/>
 	</Window.Resources>
@@ -57,21 +57,36 @@
                          Height="20"
                          Width="150"
                          Margin="10, 10, 120, 0"
-                         HorizontalAlignment="Right"/>
+                         HorizontalAlignment="Right"
+						 Text="{Binding FilterString}"/>
 				<Button Name="searchButton"
                         Grid.Row="0" 
                         Height="20"
                         Width="100"
                         Content="Search for Client"
                         HorizontalAlignment="Right"
-                        Margin="10, 10, 10, 0"/>
+                        Margin="10, 10, 10, 0"
+						Command="{Binding FilterCollection}"/>
 
 
 				<DataGrid Name="jobRequestDataGrid"
                           Grid.Row="1"
                           Margin="10"
 						  IsReadOnly="True"
-						  CanUserAddRows="False">
+						  CanUserAddRows="False"
+						  FontSize="12"
+						  ItemsSource="{Binding ClientList}"
+						  AutoGenerateColumns="False"
+						  SelectedItem="{Binding SelectedClient}">
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="Client Name" Binding="{Binding ClientName}"/>
+						<DataGridTextColumn Header="Address" Binding="{Binding Address}"/>
+						<DataGridTextColumn Header="Suburb" Binding="{Binding Suburb}"/>
+						<DataGridTextColumn Header="State" Binding="{Binding State}"/>
+						<DataGridTextColumn Header="Phone Number" Binding="{Binding ContactPhone}"/>
+						<DataGridTextColumn Header="Email" Binding="{Binding Email}"/>
+						<DataGridTextColumn Header="Notes" Binding="{Binding Notes}"/>
+					</DataGrid.Columns>
 				</DataGrid>
 			</Grid>
 
@@ -87,7 +102,7 @@
 				<Grid>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="auto"/>
-						<RowDefinition Height="1.50*"/>
+						<RowDefinition Height="2*"/>
 						<RowDefinition Height="auto"/>
 						<RowDefinition/>
 						<RowDefinition Height="auto"/>
@@ -108,18 +123,20 @@
 					<TextBox Name="jobRequestNotes"
 							 Grid.Row="1"
 							 Margin="10, 0"
-							 TextWrapping="Wrap"/>
+							 TextWrapping="Wrap"
+							 Text="{Binding JobRequestNotes}"/>
 
 
 					<TextBlock Text="Enter Requested Date"
 							   Grid.Row="2"
 							   FontSize="16"
-							   Margin="10, 10, 0, 0"
+							   Margin="10, 5, 0, 0"
 							   HorizontalAlignment="Left"
 							   VerticalAlignment="Top"/>
 					<DatePicker Name="jobRequestDate"
 								Grid.Row="3"
-								Margin="10, 0"/>
+								Margin="10, 0"
+								SelectedDate="{Binding JobRequestDateRequested}"/>
 					<Grid Grid.Row="4">
 						<Grid.RowDefinitions>
 							<RowDefinition/>
@@ -127,33 +144,42 @@
 						</Grid.RowDefinitions>
 
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition/>
-							<ColumnDefinition/>
+							<ColumnDefinition Width="auto"/>
+							<ColumnDefinition />
+							<ColumnDefinition Width="auto"/>
 						</Grid.ColumnDefinitions>
-					<TextBlock Text="Enter Requested Time"
+						<TextBlock Text="Enter Requested Time"
 							   Grid.Row="0"
 							   Grid.Column="0"
 							   FontSize="16"
-							   Margin="10, 10, 10, 0"
+							   Margin="10, 5, 10, 0"
 							   HorizontalAlignment="Left"
 							   VerticalAlignment="Top"/>
-					<TextBox Name="jobRequestTime"
-							 Grid.Row="1"
-							 Height="20"
-							 Margin="10, 0"/>
+						<ComboBox Name="jobRequestTime"
+								 Grid.Row="1"
+								 Height="20"
+								 Margin="10, 0"
+								 Width="230"
+								 SelectedIndex="0"
+								 ItemsSource="{Binding TimeRequestedOptions}"
+								 SelectedItem="{Binding JobRequestTimeRequested}">
+						</ComboBox>
 
-					<TextBlock Text="Enter Estimated Hours"
+						<TextBlock Text="Enter Estimated Hours"
 								Grid.Row="0"
-								Grid.Column="1"
+								Grid.Column="2"
 								FontSize="16"
-								Margin="10, 10, 10, 0"
+								Margin="10, 5, 10, 0"
 								HorizontalAlignment="Right"
 								VerticalAlignment="Top"/>
 					<TextBox Name="jobEstimatedHours"
-							Grid.Row="1"
-							Grid.Column="1"
-							Height="20"
-							Margin="10, 0"/>
+							 Grid.Row="1"
+							 Grid.Column="2"
+							 Height="20"
+						 	 Margin="10, 0"
+							 Width="40"
+							 HorizontalAlignment="Left"
+							 Text="{Binding JobRequestEstimatedHours}"/>
 					</Grid>
 
 
@@ -161,25 +187,28 @@
 					<TextBlock Text="Suburb"
 							   Grid.Row="5"
 							   FontSize="16"
-							   Margin="10, 10, 0, 0"
+							   Margin="10, 5, 0, 0"
 							   HorizontalAlignment="Left"
 							   VerticalAlignment="Top"/>
 					
-					<TextBox Name="jobRequestSuburb"
+					<ComboBox Name="jobRequestSuburb"
 							 Grid.Row="6"
-							 Margin="10, 0"/>
+							 Margin="10, 0"
+							 ItemsSource="{Binding SuburbList}"
+                             SelectedItem="{Binding JobRequestSuburb}"/>
 
 					
 					
 					<TextBlock Text="Address"
 							   Grid.Row="7"
 							   FontSize="16"
-							   Margin="10, 10, 0, 0"
+							   Margin="10, 5, 0, 0"
 							   HorizontalAlignment="Left"
 							   VerticalAlignment="Top"/>
 					<TextBox Name="jobRequestAddress"
 							 Grid.Row="8"
-							 Margin="10, 0"/>
+							 Margin="10, 0"
+							 Text="{Binding JobRequestAddress}"/>
 				</Grid>
 				
 				
@@ -190,6 +219,7 @@
 						<RowDefinition/>
 						<RowDefinition Height="auto"/>
 						<RowDefinition Height="auto"/>
+						<RowDefinition Height="auto"/>
 					</Grid.RowDefinitions>
 
 					<TextBlock Text="Skills Required"
@@ -197,17 +227,25 @@
 							   FontSize="16"/>
 					<DataGrid Name="skillsDataGrid" 
 							  Grid.Row="1"
-							  Margin="10, 0, 10, 10"/>
+							  FontSize="12"
+							  IsReadOnly="True"
+							  Margin="10, 0, 10, 10"
+							  ItemsSource="{Binding SelectedSkillList}"
+							  AutoGenerateColumns="False"
+							  SelectedItem="{Binding SelectedSkill}">
+						<DataGrid.Columns>
+							<DataGridTextColumn Header="Skill Name" Binding="{Binding SkillName}"/>
+							<DataGridTextColumn Header="Skill Description" Binding="{Binding SkillDescription}"/>
+						</DataGrid.Columns>
+					</DataGrid>
 
 					<ComboBox Name="skillList" 
 							  Grid.Row="2"
-							  IsEditable="True"
-							  FontSize="16"
-							  Margin="10">
-						<ComboBoxItem Content="Software Installation"/>
-						<ComboBoxItem Content="Hardware Installation"/>
-						<ComboBoxItem Content="Networking"/>
-						<ComboBoxItem Content="Elctrical Engineering"/>
+							  FontSize="12"
+							  Margin="10"
+							  ItemsSource="{Binding UnselectedSkillList}"
+							  SelectedItem="{Binding UnselectedSkill}"
+							  SelectedValuePath="{Binding SkillName}">
 					</ComboBox>
 
 
@@ -217,16 +255,33 @@
 							<ColumnDefinition/>
 						</Grid.ColumnDefinitions>
 						<Button Name="addSkill"
-									Grid.Column="1"
-									Content="Add Skill"
-									Margin="10"
-									Height="25"/>
-						<Button Name="createSkill"
-									Grid.Column="0"
-									Content="Create Skill"
-									Margin="10"
-									Height="25"/>
+								Grid.Column="0"
+								Content="Add Skill"
+								Margin="10, 5, 5, 5"
+								Height="25"
+								HorizontalAlignment="Right"
+								Width="100"
+								Command="{Binding AddSkillCommand}"/>
+						
+						<Button Name="removeSkill"
+								Grid.Column="1"
+								Content="Remove Skill"
+								Margin="5, 5, 10, 5"
+								Height="25"
+								HorizontalAlignment="Left"
+								Width="100"
+								Command="{Binding RemoveSkillCommand}"/>
+						
 					</Grid>
+					
+					<Button Name="editSkill"
+							Grid.Row="4"
+							Content="Edit Skills"
+							Margin="10"
+							Height="25"
+							HorizontalAlignment="Right"
+							Width="100"
+							Command="{Binding EditSkillCommand}"/>
 				</Grid>
 			</Grid>
 

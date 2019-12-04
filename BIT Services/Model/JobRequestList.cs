@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-	class JobRequestList : ObservableCollection<JobRequest>
+	public class JobRequestList : ObservableCollection<JobRequest>
 	{
 	}
 }

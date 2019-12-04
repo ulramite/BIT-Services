@@ -1,6 +1,7 @@
 ﻿using BIT_Services.Commands;
 using BIT_Services.Model;
 using BIT_Services.View;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +9,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Forms;
 
@@ -323,13 +323,21 @@ namespace BIT_Services.ViewModel
 
 		private void DeleteButton()
 		{
-			DialogResult confirmation = System.Windows.Forms.MessageBox.Show("Are you sure you want to delete client " + SelectedClient.ClientName + "?", "Confirm Delete", MessageBoxButtons.YesNo);
-			if (confirmation == System.Windows.Forms.DialogResult.Yes)
+			DialogResult confirmation = MessageBox.Show("Are you sure you want to delete client " + SelectedClient.ClientName + "? This will likely fail if they have any job requests.", "Confirm Delete", MessageBoxButtons.YesNo);
+			if (confirmation == DialogResult.Yes)
 			{
-				DAL.DeleteClient(SelectedClient);
-				SelectedClient = null;
-				UpdateClientList();
-				ResetDataEntry();
+
+				try
+				{
+					DAL.DeleteClient(SelectedClient);
+					SelectedClient = null;
+					UpdateClientList();
+					ResetDataEntry();
+				}
+				catch (MySqlException)
+				{
+					MessageBox.Show("Failed to delete client, ensure they do not have any job requests.", "Failed to delete", MessageBoxButtons.OK);
+				}
 			}
 			
 		}
@@ -341,36 +349,46 @@ namespace BIT_Services.ViewModel
 			string validateMessage = ValidateData();
 			if (validateMessage == null)
 			{
-				if (SelectedClient != null) // Are we in update mode?
+				try
 				{
-					Client updatedClient = new Client(
-						SelectedClient.ClientID,
-						ClientName,
-						ClientAddress,
-						ClientSuburb,
-						ClientState,
-						ClientPhone,
-						ClientEmail,
-						ClientNotes
-						);
+					if (SelectedClient != null) // Are we in update mode?
+					{
+						Client updatedClient = new Client(
+							SelectedClient.ClientID,
+							ClientName,
+							ClientAddress,
+							ClientSuburb,
+							ClientState,
+							ClientPhone,
+							ClientEmail,
+							ClientNotes
+							);
 
-					DAL.UpdateClient(updatedClient);
+						DAL.UpdateClient(updatedClient);
+						new EventLogger().Log("Inserted Client into database");
 
+					}
+					else // No we are in add mode
+					{
+						Client newClient = new Client(
+							ClientName,
+							ClientAddress,
+							ClientSuburb,
+							ClientState,
+							ClientPhone,
+							ClientEmail,
+							ClientNotes
+							);
+
+
+						DAL.InsertClient(newClient);
+						new EventLogger().Log("Updated Client in database");
+					}
 				}
-				else // No we are in add mode
+				catch (MySqlException)
 				{
-					Client newClient = new Client(
-						ClientName,
-						ClientAddress,
-						ClientSuburb,
-						ClientState,
-						ClientPhone,
-						ClientEmail,
-						ClientNotes
-						);
 
-
-					DAL.InsertClient(newClient);
+					MessageBox.Show("Failed to save client", "Saving Failed", MessageBoxButtons.OK);
 				}
 
 				SelectedClient = null;
@@ -438,10 +456,47 @@ namespace BIT_Services.ViewModel
 		/// <returns>Null if all data was successfully validated, otherwise a string describing the problem.</returns>
 		private string ValidateData()
 		{
+			if (ClientName == "" || ClientName == null)
+			{
+				return "Missing Name";
+			}
+			if (ClientAddress == "" || ClientAddress == null)
+			{
+				return "Missing Address";
+			}
+			if (ClientState == "" || ClientState == null)
+			{
+				return "Missing State";
+			}
+			if (ClientEmail == "" && ClientEmail == null)
+			{
+				return "Missing Email";
+			}
+			if (ClientSuburb == null)
+			{
+				return "Missing Suburb";
+			}
+
+
+
 			if (ClientState.Length > 3)
 			{
 				return "State must be no longer than three characters. E.G. NSW, QLD";
 			}
+			if (ClientPhone.Length != 10)
+			{
+				return "Phone number must be 10 digits long with no spaces";
+			}
+			
+			
+			
+			try { System.Net.Mail.MailAddress email = new System.Net.Mail.MailAddress(ClientEmail); }
+			catch (FormatException)
+			{
+				return "Please enter a valid email";
+			}
+
+
 			return null;
 		}
 	}

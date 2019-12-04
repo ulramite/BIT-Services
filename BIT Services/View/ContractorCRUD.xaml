@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BIT_Services.View"
 		xmlns:mycontrols="clr-namespace:BIT_Services.UserControls"
 		mc:Ignorable="d"
-        Title="ContractorCRUD" Height="700" Width="700" ResizeMode="NoResize">
+        Title="Contractors" Height="700" Width="700" ResizeMode="NoResize">
 	<Window.Resources>
 		<ResourceDictionary Source="..\Style\Styles.xaml"/>
 	</Window.Resources>
@@ -54,7 +54,8 @@
                          Width="150"
                          Margin="10, 10, 120, 0"
                          HorizontalAlignment="Right"
-						 Text="{Binding FilterString}"/>
+						 Text="{Binding FilterString}"
+						 IsEnabled="{Binding ContractorListEnabled}"/>
 				<Button Name="searchButton"
                         Grid.Row="0" 
                         Height="20"
@@ -62,7 +63,8 @@
                         Content="Search Name"
                         HorizontalAlignment="Right"
                         Margin="10, 10, 10, 0"
-						Command="{Binding FilterCollection}"/>
+						Command="{Binding FilterCollection}"
+						IsEnabled="{Binding ContractorListEnabled}"/>
 
 
 				<DataGrid Name="contractDataGrid"

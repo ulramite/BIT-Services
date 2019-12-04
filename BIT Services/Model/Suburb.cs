@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BIT_Services.Model
 {
-	class Suburb
+	public class Suburb
 	{
 		private string _suburbName;
 
@@ -20,6 +20,28 @@ namespace BIT_Services.Model
 		public override string ToString()
 		{
 			return SuburbName;
+		}
+
+		public override bool Equals(Object obj)
+		{
+			if (obj is Suburb)
+			{
+
+				return null != obj && ((Suburb)obj).SuburbName == SuburbName;
+			}
+			else if (obj is String)
+			{
+				return null != obj && (string)obj == SuburbName;
+			}
+			else
+			{
+			return false;
+			}
+		}
+
+		public override int GetHashCode()
+		{
+			return SuburbName.GetHashCode();
 		}
 	}
 }
